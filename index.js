@@ -17,7 +17,7 @@ module.exports = function(fileName, opts) {
           templateName = templateRegExp.exec(templateName) ?
             templateRegExp.exec(templateName)[1] : templateName;
         }
-        pool[templateName] = file.contents.toString();
+        pool[templateName.replace(/\/|\./gi, '_')] = file.contents.toString();
         if (!firstFile) firstFile = file;
         callback(err);
     }
