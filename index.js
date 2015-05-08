@@ -6,10 +6,17 @@ var through2  = require('through2'),
 module.exports = function(fileName, opts) {
     opts = opts || {};
     var pool = {},
-        firstFile;
+        firstFile,
+        templateRegExp = opts.excludeTemplatesPath ?
+          new RegExp(opts.excludeTemplatesPath + '(.*)' + '.html') : false;
+
     function transform(file, enc, callback) {
         var err;
         var templateName = file.path.replace(file.cwd + '/', '');
+        if (templateRegExp) {
+          templateName = templateRegExp.exec(templateName) ?
+            templateRegExp.exec(templateName)[1] : templateName;
+        }
         pool[templateName] = file.contents.toString();
         if (!firstFile) firstFile = file;
         callback(err);
@@ -17,7 +24,8 @@ module.exports = function(fileName, opts) {
     function flush(callback) {
         var err,
             namespace = opts.namespace || NAMESPACE,
-            contents = 'this.'+namespace+'='+JSON.stringify(pool)+';';
+            rootNode = opts.rootNode || 'this',
+            contents = rootNode+'.'+namespace+'='+JSON.stringify(pool)+';';
 
         var output = new gutil.File({
             cwd:  firstFile.cwd,
