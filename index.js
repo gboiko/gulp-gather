@@ -3,6 +3,9 @@ var through2  = require('through2'),
     gutil     = require('gulp-util'),
     NAMESPACE = 'MicroTemplates';
 
+// Detect if current os is win
+var isWin = /^win/.test(process.platform);
+
 module.exports = function(fileName, opts) {
     opts = opts || {};
     var pool = {},
@@ -11,8 +14,13 @@ module.exports = function(fileName, opts) {
           new RegExp(opts.excludeTemplatesPath + '(.*)' + '.html') : false;
 
     function transform(file, enc, callback) {
-        var err;
-        var templateName = file.path.replace(file.cwd + '/', '');
+        var err,
+            sepType = isWin ? '\\' : '/',
+            templateName = file.path.replace(file.cwd + sepType, '');
+
+        if (isWin) {
+          templateName = templateName.replace(/\\/gi, '/');
+        }
         if (templateRegExp) {
           templateName = templateRegExp.exec(templateName) ?
             templateRegExp.exec(templateName)[1] : templateName;
