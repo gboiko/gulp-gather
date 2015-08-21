@@ -11,7 +11,7 @@ module.exports = function(fileName, opts) {
     var pool = {},
         firstFile,
         templateRegExp = opts.excludeTemplatesPath ?
-          new RegExp(opts.excludeTemplatesPath + '(.*)' + '.html') : false;
+          new RegExp(opts.excludeTemplatesPath + '(.*)' + '(.html|.css)') : false;
 
     function transform(file, enc, callback) {
         var err,
